@@ -1,9 +1,11 @@
+import time
 from selenium.webdriver.chrome.service import Service
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 from bs4 import BeautifulSoup
-import time
 
 recipe = "hummus"
 
@@ -12,23 +14,27 @@ driver = webdriver.Chrome(service=service)
 
 
 driver.get("https://www.recipetineats.com/recipes/")
-pageExists = True
-while pageExists:
-    time.sleep(5)
-    #ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
-    links = driver.find_elements(By.XPATH, "//h2/a[@rel]")
-    for link in links:
-        # print (link.get_attribute("href"))
-        print (link.text)
 
-    nextPage = driver.find_element(By.XPATH, "/html/body/div[1]/div[3]/div[3]/main/div/div/ul/li[last()]")
-   
-    if nextPage.get_attribute("class") != "pagination-next":
-        print("all pages scraped...")
-        pageExists = False
-    else:
-        nextPage.click()
-        print('moving on')
+def find_links():
+    recipeLinks = []
+    pageExists = True
+    while pageExists:
+        # to avoid StaleElementReferenceException
+        time.sleep(5)
+        links = driver.find_elements(By.XPATH, "//h2/a[@rel]")
+        for link in links:
+            recipeLinks.append(link.get_attribute("href"))
+
+        nextPage = driver.find_element(By.XPATH, "/html/body/div[1]/div[3]/div[3]/main/div/div/ul/li[last()]")
+    
+        if nextPage.get_attribute("class") != "pagination-next":
+            print("all pages scraped...")
+            pageExists = False
+        else:
+            nextPage.click()
+
+    print(len(recipeLinks))
+    return recipeLinks
 
 # driver.find_element(By.CLASS_NAME, "general-search__icon-button").click()
 # search = driver.find_element(By.CLASS_NAME, 'general-search__input')
