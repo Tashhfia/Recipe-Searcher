@@ -1,3 +1,6 @@
-# Recipe-Searcher
+# Best of Recipetin Eats!
 
-Automated the searching process for recipes on google. This program uses selenium to search for the user specified recipe on google and returns the top 10 highest rated recipes it found
+A collection of the best rated and most popular recipes from Nagi!
+
+Uses Selenium and Beautiful soup to scrap recipe ratings from https://www.recipetineats.com/recipes/
+
