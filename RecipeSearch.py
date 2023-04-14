@@ -12,10 +12,23 @@ driver = webdriver.Chrome(service=service)
 
 
 driver.get("https://www.recipetineats.com/recipes/")
+pageExists = True
+while pageExists:
+    time.sleep(5)
+    #ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
+    links = driver.find_elements(By.XPATH, "//h2/a[@rel]")
+    for link in links:
+        # print (link.get_attribute("href"))
+        print (link.text)
 
-links = driver.find_elements(By.XPATH, "//h2/a[@rel]")
-for link in links:
-    print (link.get_attribute("href"))
+    nextPage = driver.find_element(By.XPATH, "/html/body/div[1]/div[3]/div[3]/main/div/div/ul/li[last()]")
+   
+    if nextPage.get_attribute("class") != "pagination-next":
+        print("all pages scraped...")
+        pageExists = False
+    else:
+        nextPage.click()
+        print('moving on')
 
 # driver.find_element(By.CLASS_NAME, "general-search__icon-button").click()
 # search = driver.find_element(By.CLASS_NAME, 'general-search__input')
