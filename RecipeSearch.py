@@ -42,6 +42,7 @@ class Scraper:
                 except:
                     print("Something went wrong!")
                     self.driver.close()
+                    pageExists = False
 
             print(f"No of links extracted: {len(recipeLinks)}")
             self.driver.close()
@@ -64,14 +65,44 @@ class Scraper:
             print("No links to save!")
 
     def ratingsScraper(self):
-        print(self.siteLink[1])
-        self.driver.get(self.siteLink[0])
+        rev = {"Name":[], "Rating": [], "Votes": [], "Course": []}
+        print(self.siteLink[14])
+        self.driver.get(self.siteLink[14])
+        try:
+            recipe = self.driver.find_element(By.XPATH, 
+                                              "/html/body/div[1]/div[3]/div[2]/main/article/header/div[2]/div/a")
+            print(recipe.text)
+            # if its a recipe then proceed
+            if recipe.text == "RECIPE V":
+                recipe.click()
+                time.sleep(5)
+                rev["Name"].append(self.driver.find_element(
+                    By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/h2").text)
+                rev["Rating"].append(self.driver.find_element(
+                    By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[1]").text)
+                rev["Votes"].append(self.driver.find_element(
+                    By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[2]").text)
+                rev["Course"].append(self.driver.find_element(
+                    By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[2]/div[last()-1]/span[2]").text)
+                
+                print(rev)
+
+            # otherwise skip entry
+            else:
+                print("this is not a recipe!")
+        except NoSuchElementException:
+            print("Element not found")
+            # return rev
+
+        
+
         # for page in linkList:
         #     self.driver.get(page)
 
 
 
 def readList(path):
+    """ Finds and opens text file and converts it to a list"""
     my_file = open(path, "r")
     content = my_file.read()
     data_into_list = content.split("\n")
