@@ -41,13 +41,19 @@ def findLinks(site):
                 nextPage.click()
         except:
             print("Something went wrong!")
+            driver.close()
 
     print(len(recipeLinks))
+    driver.close()
     return recipeLinks
+
 
 # uncommnent only if you lose the links
 # link_list = findLinks(site)
 # with open('recipe_links.txt', 'w') as f:
 #     for r in link_list:
 #         f.write(f"{r}\n")
+
+
+
 
