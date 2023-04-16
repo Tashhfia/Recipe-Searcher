@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from bs4 import BeautifulSoup
+
 
 recipe = "hummus"
 site = "https://www.recipetineats.com/recipes/"
@@ -46,7 +46,6 @@ def findLinks(site):
     print(len(recipeLinks))
     driver.close()
     return recipeLinks
-
 
 # uncommnent only if you lose the links
 # link_list = findLinks(site)

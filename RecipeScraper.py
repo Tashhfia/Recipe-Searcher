@@ -1,5 +1,10 @@
+from bs4 import BeautifulSoup
 
-print("herllo")
+
 my_file = open("recipe_links.txt", "r")
-data = my_file.read()
-print(len(data))
+content = my_file.read()
+print(content)
+
+data_into_list = content.split("\n")
+print(len(data_into_list))
+my_file.close()
