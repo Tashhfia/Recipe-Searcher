@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+import csv
 
 
 class Scraper:
@@ -65,39 +66,49 @@ class Scraper:
             print("No links to save!")
 
     def ratingsScraper(self):
-        rev = {"Name":[], "Rating": [], "Votes": [], "Course": []}
-        print(self.siteLink[14])
-        self.driver.get(self.siteLink[14])
-        try:
-            recipe = self.driver.find_element(By.XPATH, 
-                                              "/html/body/div[1]/div[3]/div[2]/main/article/header/div[2]/div/a")
-            print(recipe.text)
-            # if its a recipe then proceed
-            if recipe.text == "RECIPE V":
-                recipe.click()
-                time.sleep(5)
-                rev["Name"].append(self.driver.find_element(
-                    By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/h2").text)
-                rev["Rating"].append(self.driver.find_element(
-                    By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[1]").text)
-                rev["Votes"].append(self.driver.find_element(
-                    By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[2]").text)
-                rev["Course"].append(self.driver.find_element(
-                    By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[2]/div[last()-1]/span[2]").text)
-                
-                print(rev)
-
-            # otherwise skip entry
-            else:
-                print("this is not a recipe!")
-        except NoSuchElementException:
-            print("Element not found")
-            # return rev
-
         
+        rev = {"Name":[], "Rating": [], "Votes": [], "Course": []}
+            # print(self.siteLink[14])
+            # self.driver.get(self.siteLink[14])
+        for page in self.siteLink:
+            
+            try:
+                self.driver.get(page)
+                time.sleep(5)
+                recipe = self.driver.find_element(By.XPATH, 
+                                                "/html/body/div[1]/div[3]/div[2]/main/article/header/div[2]/div/a")
+                print(recipe.text)
+                # if its a recipe then proceed
+                if recipe.text == "RECIPE V":
+                    recipe.click()
+                    time.sleep(8)
+                    rev["Name"].append(self.driver.find_element(
+                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/h2").text)
+                    rev["Rating"].append(self.driver.find_element(
+                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[1]").text)
+                    rev["Votes"].append(self.driver.find_element(
+                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[2]").text)
+                    rev["Course"].append(self.driver.find_element(
+                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[2]/div[last()-1]/span[2]").text)
+                    
+                    print(rev)
 
-        # for page in linkList:
-        #     self.driver.get(page)
+                # otherwise skip entry
+                else:
+                    print("this is not a recipe!")
+                    continue
+            except:
+                print("Element not found")
+                # return rev
+
+        with open('recipeInfo.csv', 'w') as f:  # You will need 'wb' mode in Python 2.x
+            w = csv.DictWriter(f, rev.keys())
+            w.writeheader()
+            w.writerow(rev)
+
+        self.driver.close()
+
+
 
 
 
