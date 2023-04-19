@@ -6,6 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 import csv
+import pandas as pd
 
 
 class Scraper:
@@ -101,12 +102,11 @@ class Scraper:
                 print("Element not found")
                 # return rev
 
-        with open('recipeInfo.csv', 'w') as f:  # You will need 'wb' mode in Python 2.x
-            w = csv.DictWriter(f, rev.keys())
-            w.writeheader()
-            w.writerow(rev)
-
         self.driver.close()
+
+        
+
+        return rev
 
 
 
@@ -129,5 +129,7 @@ if __name__ == '__main__':
     # s1.getLinks()                    // uncomment only if you lose the links text file
     recipeLinks = readList("recipe_links.txt")
     s2 = Scraper(recipeLinks)
-    s2.ratingsScraper()
+    recipe_dict = s2.ratingsScraper()
+    df = pd.DataFrame.from_dict(recipe_dict) 
+    df.to_csv('recipe_info.csv')
 
