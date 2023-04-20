@@ -5,9 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-import csv
 import pandas as pd
-
+import pickle
 
 class Scraper:
     def __init__(self,siteLink):
@@ -67,10 +66,12 @@ class Scraper:
             print("No links to save!")
 
     def ratingsScraper(self):
+
+        """ Takes a list of links and returns a dictionary with all scraped recipe names, 
+        ratings, votes and course."""
         
         rev = {"Name":[], "Rating": [], "Votes": [], "Course": []}
-            # print(self.siteLink[14])
-            # self.driver.get(self.siteLink[14])
+
         for page in self.siteLink:
             
             try:
@@ -83,14 +84,32 @@ class Scraper:
                 if recipe.text == "RECIPE V":
                     recipe.click()
                     time.sleep(8)
-                    rev["Name"].append(self.driver.find_element(
-                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/h2").text)
-                    rev["Rating"].append(self.driver.find_element(
-                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[1]").text)
-                    rev["Votes"].append(self.driver.find_element(
-                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[2]").text)
-                    rev["Course"].append(self.driver.find_element(
-                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[2]/div[last()-1]/span[2]").text)
+                    name = self.driver.find_element(
+                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/h2").text
+                    rating = self.driver.find_element(
+                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[1]").text
+                    votes = self.driver.find_element(
+                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[3]/div/span[2]").text
+                    course = self.driver.find_element(
+                        By.XPATH,"/html/body/div[1]/div[3]/div[2]/main/article/div/div[4]/div/div[2]/div[1]/div[2]/div[last()-1]/span[2]").text
+                    
+                    # if element wasnt found, append null
+                    if name:
+                        rev["Name"].append(name)
+                    else:
+                        rev["Name"].append("Null")
+                    if rating:    
+                        rev["Rating"].append(rating)
+                    else:
+                        rev["Rating"].append("Null")
+                    if votes:
+                        rev["Votes"].append(votes)
+                    else:
+                        rev["Votes"].append("Null")
+                    if course:
+                        rev["Course"].append(course)
+                    else:
+                        rev["Course"].append("Null")
                     
                     print(rev)
 
@@ -104,16 +123,12 @@ class Scraper:
 
         self.driver.close()
 
-        
-
         return rev
 
-
-
-
-
 def readList(path):
+
     """ Finds and opens text file and converts it to a list"""
+
     my_file = open(path, "r")
     content = my_file.read()
     data_into_list = content.split("\n")
@@ -130,6 +145,25 @@ if __name__ == '__main__':
     recipeLinks = readList("recipe_links.txt")
     s2 = Scraper(recipeLinks)
     recipe_dict = s2.ratingsScraper()
-    df = pd.DataFrame.from_dict(recipe_dict) 
-    df.to_csv('recipe_info.csv')
+
+    # keep either the pickle or csv codes
+    # Store data (serialize)
+    try:
+        with open('recipe_dict.pickle', 'wb') as handle:
+            pickle.dump(recipe_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    except:
+        print("error while pickling!")
+    try:
+        df = pd.DataFrame.from_dict(recipe_dict) 
+        df.to_csv('recipe_info.csv')
+    except:
+        print("error while saving to csv")
+
+    # # Load data (deserialize)
+    # with open('filename.pickle', 'rb') as handle:
+    #     unserialized_data = pickle.load(handle)
+
+    # print(your_data == unserialized_data)
+
+    
 
